@@ -16,6 +16,7 @@ def add_book():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+
 @book_bp.route('/<int:book_id>', methods=['GET'])
 def get_book_by_id(book_id):
     try:
@@ -26,6 +27,7 @@ def get_book_by_id(book_id):
         return jsonify(book.to_dict()), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
 
 @book_bp.route('/<int:book_id>', methods=['PUT'])
 def update_book(book_id):
@@ -79,8 +81,8 @@ book_ns = Namespace('books', description="Operations related to books")
 book_model = book_ns.model('Book', {
     'title': fields.String(required=True, description='The title of the book'),
     'author': fields.String(required=True, description='The author of the book'),
-    'year': fields.Integer(required=True, description='The publication year of the book'),
-    'isbn': fields.String(required=True, description='The ISBN of the book')
+    'year': fields.Integer(required=False, description='The publication year of the book'),
+    'isbn': fields.String(required=False, description='The ISBN of the book')
 })
 
 @book_ns.route('/')
@@ -123,7 +125,9 @@ class BookDetail(Resource):
         updated_book = BookService.update_book(book_id, data)
         if updated_book:
             return updated_book.to_dict(), 200
-        return {'message': 'Book not found'}, 404    @book_ns.doc('get_book_by_id')
+        return ({'message': 'Book not found'}, 404
+
+    @book_ns.doc('get_book_by_id'))
     @book_ns.marshal_with(book_model)
     def get(self, book_id):
         """

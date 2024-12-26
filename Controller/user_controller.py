@@ -24,3 +24,5 @@ def get_profile():
     return jsonify(request.user), 200
 
 
+
+
