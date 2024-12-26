@@ -1,14 +1,7 @@
 from flask import Blueprint, request, jsonify
-
 from Service.book_service import BookService
 
 book_bp = Blueprint('book', __name__, url_prefix='/books')
-@book_bp.route('/', methods=['GET'])
-def get_books():
-    books = BookService.get_all_books()
-    if not books:
-        return jsonify([]), 200
-    return jsonify([book.to_dict() for book in books]), 200
 
 @book_bp.route('/', methods=['POST'])
 def add_book():
@@ -58,4 +51,27 @@ def delete_book(book_id):
         return jsonify({"message": f"Book with ID {book_id} deleted successfully"}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+# Controller/book_controller.py
+@book_bp.route('/', methods=['GET'])
+def get_books():
+    page = request.args.get('page', default=1, type=int)
+    per_page = request.args.get('per_page', default=3, type=int)
+    author = request.args.get('author', type=str)
+    year = request.args.get('year', type=int)
+
+    # Fetch books with filters and pagination
+    pagination = BookService.get_filtered_books(page, per_page, author, year)
+    books = pagination.items  # Get the items for the current page
+
+    response = {
+        "books": [book.to_dict() for book in books],
+        "total": pagination.total,  # Total number of filtered books
+        "pages": pagination.pages,  # Total number of pages
+        "current_page": pagination.page  # Current page number
+    }
+    return jsonify(response), 200
+
+
+
 

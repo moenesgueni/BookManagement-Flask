@@ -2,9 +2,19 @@ from Model.book_model import Book
 from database import db
 
 class BookService:
+
     @staticmethod
-    def get_all_books():
-        return Book.query.all()
+    def get_filtered_books(page, per_page, author=None, year=None):
+        query = Book.query
+
+        # Apply filters if present
+        if author:
+            query = query.filter(Book.author.ilike(f"%{author}%"))  # Case-insensitive search
+        if year:
+            query = query.filter(Book.year == year)
+
+        # Apply pagination
+        return query.paginate(page=page, per_page=per_page, error_out=False)
 
 
     @staticmethod
