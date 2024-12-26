@@ -29,31 +29,37 @@ class BookService:
         db.session.commit()
         return new_book
 
-    @staticmethod
-    def get_book_by_id(book_id):
-        return Book.query.get(book_id)
-
-    @staticmethod
-    def update_book(book_id, data):
-        book = Book.query.get(book_id)
-        if not book:
-            return None
-
-        # Update fields
-        book.title = data.get('title', book.title)
-        book.author = data.get('author', book.author)
-        book.year = data.get('year', book.year)
-        book.isbn = data.get('isbn', book.isbn)
-
-        db.session.commit()
-        return book
 
     @staticmethod
     def delete_book(book_id):
+        """
+        Delete a book by ID.
+        """
         book = Book.query.get(book_id)
-        if not book:
-            return None
+        if book:
+            db.session.delete(book)
+            db.session.commit()
+            return True
+        return False
 
-        db.session.delete(book)
-        db.session.commit()
-        return book
+    @staticmethod
+    def update_book(book_id, data):
+        """
+        Update a book by ID.
+        """
+        book = Book.query.get(book_id)
+        if book:
+            book.title = data.get('title', book.title)
+            book.author = data.get('author', book.author)
+            book.year = data.get('year', book.year)
+            book.isbn = data.get('isbn', book.isbn)
+            db.session.commit()
+            return book
+        return None
+    @staticmethod
+    def get_book_by_id(book_id):
+        """
+        Get a book by its ID.
+        """
+        return Book.query.get(book_id)
+

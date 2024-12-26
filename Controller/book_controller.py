@@ -1,5 +1,6 @@
 from flask import Blueprint, request, jsonify
 from Service.book_service import BookService
+from flask_restx import Namespace, Resource, fields
 
 book_bp = Blueprint('book', __name__, url_prefix='/books')
 
@@ -71,6 +72,72 @@ def get_books():
         "current_page": pagination.page  # Current page number
     }
     return jsonify(response), 200
+
+book_ns = Namespace('books', description="Operations related to books")
+
+# Define a book model for documentation
+book_model = book_ns.model('Book', {
+    'title': fields.String(required=True, description='The title of the book'),
+    'author': fields.String(required=True, description='The author of the book'),
+    'year': fields.Integer(required=True, description='The publication year of the book'),
+    'isbn': fields.String(required=True, description='The ISBN of the book')
+})
+
+@book_ns.route('/')
+class BookList(Resource):
+    @book_ns.doc('list_books')
+    @book_ns.marshal_with(book_model, as_list=True)
+    def get(self):
+        """Get all books"""
+        books = BookService.get_filtered_books(1,3)
+        return [book.to_dict() for book in books], 200
+
+    @book_ns.expect(book_model)
+    @book_ns.doc('create_book')
+    def post(self):
+        """Add a new book"""
+        data = request.json
+        new_book = BookService.add_book(data)
+        return jsonify(new_book)
+@book_ns.route('/<int:book_id>')
+class BookDetail(Resource):
+
+    @book_ns.doc('delete_book')
+    @book_ns.response(204, 'Book deleted successfully')
+    def delete(self, book_id):
+        """
+        Delete a book by ID.
+        """
+        success = BookService.delete_book(book_id)
+        if success:
+            return '', 204
+        return {'message': 'Book not found'}, 404
+
+    @book_ns.expect(book_model)
+    @book_ns.doc('update_book')
+    def put(self, book_id):
+        """
+        Update a book by ID.
+        """
+        data = request.json
+        updated_book = BookService.update_book(book_id, data)
+        if updated_book:
+            return updated_book.to_dict(), 200
+        return {'message': 'Book not found'}, 404    @book_ns.doc('get_book_by_id')
+    @book_ns.marshal_with(book_model)
+    def get(self, book_id):
+        """
+        Get a book by its ID.
+        """
+        book = BookService.get_book_by_id(book_id)
+        if not book:
+            return {'message': 'Book not found'}, 404
+        return book.to_dict(), 200
+
+# Register the namespace with the main application
+def register_book_namespace(api):
+    api.add_namespace(book_ns)
+
 
 
 
