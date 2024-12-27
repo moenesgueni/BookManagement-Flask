@@ -20,8 +20,8 @@ class Book(db.Model):
         id = fields.Int(dump_only=True)
         title = fields.Str(required=True, validate=validate.Length(min=1, max=50))
         author = fields.Str(required=True, validate=validate.Length(min=1, max=50))
-        year = fields.Int(required=True, validate=validate.Range(min=1800, max=2024))  # Validate publication year
-        isbn = fields.Str(required=True, validate=validate.Regexp(r'^\d{13}$'))  # Validate ISBN
+        year = fields.Int(required=False, validate=validate.Range(min=1800, max=2024))  # Validate publication year
+        isbn = fields.Str(required=False, validate=validate.Regexp(r'^\d{13}$'))  # Validate ISBN
 
 # Instantiate schema objects
     book_schema = BookSchema()
