@@ -11,7 +11,7 @@ class UserService:
     def authenticate(username, password):
         user = User.query.filter_by(username=username).first()
         if user and check_password_hash(user.password, password):
-            return generate_jwt({"user_id": user.id, "username": user.username})
+            return generate_jwt({"user_id": user.id, "username": user.username })
         return None
 
     @staticmethod

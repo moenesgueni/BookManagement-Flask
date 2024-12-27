@@ -2,7 +2,7 @@
 import jwt
 import datetime
 from functools import wraps
-from flask import request, jsonify
+from flask import request, jsonify, make_response
 
 SECRET_KEY = "your_secret_key"
 
@@ -18,19 +18,20 @@ def verify_jwt(token):
     except jwt.InvalidTokenError:
         return None  # Token invalide
 
+
 def jwt_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         token = request.headers.get('Authorization')
         if not token:
-            return jsonify({"error": "Token missing"}), 401
+            return make_response(jsonify({"error": "Token missing"}), 401)
 
         # Supprimer "Bearer " si présent
         token = token.replace("Bearer ", "")
 
         decoded = verify_jwt(token)
         if not decoded:
-            return jsonify({"error": "Invalid or expired token"}), 401
+            return make_response(jsonify({"error": "Invalid or expired token"}), 401)
 
         # Ajouter les données décodées dans la requête
         request.user = decoded

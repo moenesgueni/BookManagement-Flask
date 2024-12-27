@@ -1,10 +1,11 @@
 from flask import Flask
 from flask_restx import Api, Resource
 from database import db
-
+from flask_jwt_extended import JWTManager
 # Import your blueprints (controllers)
 from Controller.book_controller import book_bp, register_book_namespace
 from Controller.user_controller import user_bp
+
 
 def create_app():
     app = Flask(__name__)
@@ -23,7 +24,7 @@ def create_app():
     register_book_namespace(api)
     # Register blueprints
     app.register_blueprint(book_bp, url_prefix='/books')
-    app.register_blueprint(user_bp, url_prefix='/users')
+    app.register_blueprint(user_bp, url_prefix='/login')
 
     with app.app_context():
         db.create_all()  # Create tables if they don't exist

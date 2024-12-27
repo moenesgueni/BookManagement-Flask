@@ -1,6 +1,5 @@
 # Controller/user_controller.py
 from flask import Blueprint, request, jsonify
-
 from Service.jwt_service import jwt_required
 from Service.user_service import UserService
 
@@ -22,6 +21,7 @@ def login():
 @jwt_required
 def get_profile():
     return jsonify(request.user), 200
+
 
 
 
